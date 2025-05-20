@@ -1,0 +1,10 @@
+{
+        "qbit_server_ip": "localhost",
+        "qbit_server_port": "8080",
+        "qbit_torrent_port": "12345",
+        "username": "admin",
+        "password": "adminadmin",
+        "azire_ip": "",
+        "azire_token": "",
+        "log_file": ".\\logfile.log"
+    }
