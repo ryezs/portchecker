@@ -8,7 +8,7 @@ import time
 import psutil
 import json
 
-version = "1.0.0"
+version = "1.0.1"
 
 
 def azire_get_ports(ip, tkn):
@@ -128,7 +128,7 @@ def run():
             "qbit_server_port": cfg['qbit_server_port'],
             "username": cfg['username'],
             "password": cfg['password'],
-            "torrent_port": port,
+            "torrent_port": str(port),
             "azire_ip": cfg['azire_ip'],
             "azire_token": cfg['azire_token'],
             "log_file": cfg['log_file']
