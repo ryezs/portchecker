@@ -104,7 +104,7 @@ def qbit_start():
 
 def run():
 
-    with open('..\\config.json') as f:
+    with open('//config.json') as f:
         cfg = json.load(f)
 
     write_log(cfg, f"Starting Script v{version}")
