@@ -54,7 +54,7 @@ def qbit_auth(config):
         'password': f'{config["password"]}'
     }
     headers = {
-        'Referer': f'{config["qbit_server_ip"]}:{config["qbit_server_port"]}'
+        'Referer': f'http://{config["qbit_server_ip"]}:{config["qbit_server_port"]}'
     }
     session = requests.Session()
 
