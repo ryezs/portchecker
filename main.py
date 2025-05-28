@@ -8,7 +8,7 @@ import time
 import psutil
 import json
 
-version = "1.0.1"
+version = "1.0.2"
 
 
 def azire_get_ports(ip, tkn):
