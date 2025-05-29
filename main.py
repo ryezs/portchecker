@@ -8,7 +8,7 @@ import time
 import psutil
 import json
 
-version = "1.0.1"
+version = "1.0.2"
 
 
 def azire_get_ports(ip, tkn):
@@ -54,7 +54,7 @@ def qbit_auth(config):
         'password': f'{config["password"]}'
     }
     headers = {
-        'Referer': f'{config["qbit_server_ip"]}:{config["qbit_server_port"]}'
+        'Referer': f'http://{config["qbit_server_ip"]}:{config["qbit_server_port"]}'
     }
     session = requests.Session()
 
