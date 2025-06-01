@@ -8,7 +8,7 @@ import time
 import psutil
 import json
 
-version = "1.0.2"
+version = "1.0.3"
 
 
 def azire_get_ports(ip, tkn):
@@ -56,21 +56,27 @@ def qbit_auth(config):
     headers = {
         'Referer': f'http://{config["qbit_server_ip"]}:{config["qbit_server_port"]}'
     }
-    session = requests.Session()
+    try:
+        session = requests.Session()
 
-    response = session.post(url, data=login_data, headers=headers)
-
+        response = session.post(url, data=login_data, headers=headers)
+    except:
+        write_log(config, "Failed to authenticate qbit")
     return session.cookies
 
 
 def qbit_set_port(config):
     cookies = qbit_auth(config)
+    print(cookies)
 
     url = f'http://{config["qbit_server_ip"]}:{config["qbit_server_port"]}/api/v2/app/setPreferences'
     data = {
         'json': f'{{"listen_port": "{config["torrent_port"]}"}}'
     }
-    response = requests.post(url, data=data, cookies=cookies)
+    try:
+        response = requests.post(url, data=data, cookies=cookies)
+    except:
+        write_log(config, "Failed to set qbit port")
 
 
 def qbit_get_port(config):
@@ -104,7 +110,7 @@ def qbit_start():
 
 def run():
 
-    with open('//config.json') as f:
+    with open('config.json') as f:
         cfg = json.load(f)
 
     write_log(cfg, f"Starting Script v{version}")
@@ -137,12 +143,11 @@ def run():
         qbit_port = qbit_get_port(config)
 
         try:
-            if str(qbit_port) != config["torrent_port"]:
+            if str(qbit_port) != config["torrent_port"] and qbit_port:
                 qbit_set_port(config)
                 write_log(config, f'old port: {qbit_port} new port: {config["torrent_port"]}')
         except:
             write_log(config, "Failed to set qbit port")
-            break
         time.sleep(60)
 
 
