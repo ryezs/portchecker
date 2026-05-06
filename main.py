@@ -8,7 +8,7 @@ import time
 import psutil
 import json
 
-version = "1.0.3"
+version = "1.0.4"
 
 
 def azire_get_ports(ip, tkn):
@@ -63,9 +63,20 @@ def qbit_auth(config):
     except:
         write_log(config, "Failed to authenticate qbit")
     return session.cookies
+    
+def is_valid_port(port):  # 🟢 NYTT
+    try:
+        p = int(port)
+        return 1 <= p <= 65535
+    except:
+        return False
 
 
 def qbit_set_port(config):
+    if not is_valid_port(config["torrent_port"]):  # 🔴 ÄNDRING
+        write_log(config, f"Invalid port, skipping update: {config['torrent_port']}")  # 🟢 NYTT
+        return  # 🟢 NYTT
+
     cookies = qbit_auth(config)
     print(cookies)
 
@@ -115,19 +126,30 @@ def run():
 
     write_log(cfg, f"Starting Script v{version}")
 
+    last_valid_port = None  # 🟢 NYTT
+
     while True:
         port = cfg['qbit_torrent_port']
 
         if not port:
             try:
                 port = azire_get_ports(cfg['azire_ip'], cfg['azire_token'])
-                if not port:
-                    write_log(cfg, "Failed getting port from azire")
+
+                if not is_valid_port(port):  # 🔴 ÄNDRING
+                    write_log(cfg, f"Invalid port from azire: {port}")  # 🟢 NYTT
                     time.sleep(300)
+                    continue  # 🔴 ÄNDRING (STOPPAR ALLT)
+
+                last_valid_port = port  # 🟢 NYTT
+
             except:
                 write_log(cfg, "Failed communicating with azire")
                 time.sleep(300)
                 continue
+
+        if not is_valid_port(port) and last_valid_port:  
+            write_log(cfg, f"Using last known valid port: {last_valid_port}")
+            port = last_valid_port
 
         config = {
             "qbit_server_ip": cfg['qbit_server_ip'],
@@ -143,11 +165,16 @@ def run():
         qbit_port = qbit_get_port(config)
 
         try:
-            if str(qbit_port) != config["torrent_port"] and qbit_port:
+            # 🔴 ÄNDRING: extra skydd här också
+            if (
+                is_valid_port(config["torrent_port"])  # 🟢 NYTT
+                and str(qbit_port) != config["torrent_port"]
+            ):
                 qbit_set_port(config)
                 write_log(config, f'old port: {qbit_port} new port: {config["torrent_port"]}')
         except:
             write_log(config, "Failed to set qbit port")
+
         time.sleep(60)
 
 
